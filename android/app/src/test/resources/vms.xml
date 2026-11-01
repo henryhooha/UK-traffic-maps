@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<d2LogicalModel xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <payloadPublication xsi:type="VmsTablePublication" lang="en">
+    <vmsUnitTable id="T1">
+      <vmsUnitRecord id="M1/4567B" version="1">
+        <vmsRecord vmsIndex="1"><vmsRecord><vmsType>matrixSignal</vmsType>
+          <vmsLocation xsi:type="Point"><pointByCoordinates><bearing>355</bearing><pointCoordinates><latitude>52.0500</latitude><longitude>-0.7800</longitude></pointCoordinates></pointByCoordinates></vmsLocation>
+        </vmsRecord></vmsRecord>
+        <vmsRecord vmsIndex="2"><vmsRecord><vmsType>matrixSignal</vmsType></vmsRecord></vmsRecord>
+        <vmsRecord vmsIndex="3"><vmsRecord><vmsType>matrixSignal</vmsType></vmsRecord></vmsRecord>
+      </vmsUnitRecord>
+      <vmsUnitRecord id="M1/9000A" version="1">
+        <vmsRecord vmsIndex="1"><vmsRecord><vmsType>variableMessageSign</vmsType>
+          <vmsLocation xsi:type="Point"><pointByCoordinates><bearing>0</bearing><pointCoordinates><latitude>52.0300</latitude><longitude>-0.7750</longitude></pointCoordinates></pointByCoordinates></vmsLocation>
+        </vmsRecord></vmsRecord>
+      </vmsUnitRecord>
+    </vmsUnitTable>
+  </payloadPublication>
+  <payloadPublication xsi:type="VmsPublication" lang="en">
+    <vmsUnit>
+      <vmsUnitTableReference id="T1" targetClass="VmsUnitTable"/>
+      <vmsUnitReference id="M1/4567B" targetClass="VmsUnitRecord"/>
+      <vms vmsIndex="1"><vms><vmsMessage messageIndex="1"><vmsMessage>
+        <vmsPictogramDisplayArea pictogramDisplayAreaIndex="1"><vmsPictogramDisplayArea><vmsPictogram pictogramIndex="1"><vmsPictogram><pictogramDescription>laneClosed</pictogramDescription></vmsPictogram></vmsPictogram></vmsPictogramDisplayArea></vmsPictogramDisplayArea>
+      </vmsMessage></vmsMessage><timeLastSet>2026-11-01T16:00:00Z</timeLastSet></vms></vms>
+      <vms vmsIndex="2"><vms><vmsMessage messageIndex="1"><vmsMessage>
+        <vmsPictogramDisplayArea pictogramDisplayAreaIndex="1"><vmsPictogramDisplayArea><vmsPictogram pictogramIndex="1"><vmsPictogram><pictogramDescription>maximumSpeedLimit</pictogramDescription><speedAttribute>64</speedAttribute></vmsPictogram></vmsPictogram></vmsPictogramDisplayArea></vmsPictogramDisplayArea>
+      </vmsMessage></vmsMessage></vms></vms>
+      <vms vmsIndex="3"><vms><vmsMessage messageIndex="1"><vmsMessage>
+        <vmsPictogramDisplayArea pictogramDisplayAreaIndex="1"><vmsPictogramDisplayArea><vmsPictogram pictogramIndex="1"><vmsPictogram><pictogramDescription>maximumSpeedLimit</pictogramDescription><speedAttribute>64</speedAttribute></vmsPictogram></vmsPictogram></vmsPictogramDisplayArea></vmsPictogramDisplayArea>
+      </vmsMessage></vmsMessage></vms></vms>
+    </vmsUnit>
+    <vmsUnit>
+      <vmsUnitReference id="M1/9000A" targetClass="VmsUnitRecord"/>
+      <vms vmsIndex="1"><vms><vmsMessage messageIndex="1"><vmsMessage><textPage pageNumber="1"><vmsText>
+        <vmsTextLine lineIndex="1"><vmsTextLine><vmsTextLine>ACCIDENT</vmsTextLine></vmsTextLine></vmsTextLine>
+        <vmsTextLine lineIndex="2"><vmsTextLine><vmsTextLine>J14-15</vmsTextLine></vmsTextLine></vmsTextLine>
+        <vmsTextLine lineIndex="3"><vmsTextLine><vmsTextLine>2 LANES CLOSED</vmsTextLine></vmsTextLine></vmsTextLine>
+      </vmsText></textPage></vmsMessage></vmsMessage></vms></vms>
+    </vmsUnit>
+  </payloadPublication>
+</d2LogicalModel>

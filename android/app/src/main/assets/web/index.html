@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Road Ahead</title>
+  <link rel="stylesheet" href="leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Top: search (idle) / next turn (driving) -->
+  <div id="top">
+    <div id="searchbar" class="card">
+      <button id="menu-btn" class="icon-btn" aria-label="Menu">☰</button>
+      <input id="dest" placeholder="Where to?" autocomplete="off" />
+      <button id="clear-dest" class="icon-btn hidden" aria-label="Clear">✕</button>
+    </div>
+    <ul id="results" class="card hidden"></ul>
+    <div id="turn" class="hidden">
+      <div id="turn-arrow">↑</div>
+      <div><div id="turn-dist"></div><div id="turn-text"></div></div>
+    </div>
+    <div id="alert" class="hidden">
+      <div class="alert-row">
+        <div id="alert-icon"></div>
+        <div class="alert-main"><div id="alert-dist"></div><div id="alert-title"></div><div id="alert-sub"></div></div>
+      </div>
+      <div id="alert-sign"></div>
+      <div class="alert-actions"><button id="alert-avoid" class="btn warn">Avoid</button><button id="alert-stay" class="btn ghost">Stay</button></div>
+    </div>
+    <div id="demo-badge" class="hidden">DEMO gantry data — add a National Highways feed in Settings</div>
+  </div>
+
+  <!-- Floating controls -->
+  <button id="recenter" class="fab small hidden" aria-label="Recenter">◎</button>
+  <button id="ahead-btn" class="fab small hidden" aria-label="Road ahead">☰<span id="ahead-count"></span></button>
+  <button id="report-btn" class="fab report" aria-label="Report">⚠</button>
+
+  <!-- Bottom HUD while driving -->
+  <div id="hud" class="hidden">
+    <div id="limit" class="limit hidden"><span></span></div>
+    <div id="speed"><b>0</b><small>mph</small></div>
+    <div id="hud-info"><div id="eta"></div><div id="road"></div></div>
+    <button id="stop" class="btn danger">Stop</button>
+  </div>
+
+  <!-- Bottom sheet (routes / report / road ahead / diversion / menu / settings / reports) -->
+  <div id="sheet" class="hidden">
+    <div class="grab"></div>
+    <div id="sheet-body"></div>
+  </div>
+
+  <div id="busy" class="hidden"><div class="spinner"></div><span></span></div>
+  <div id="toast" class="hidden"></div>
+
+  <script src="leaflet.js"></script>
+  <script src="signs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

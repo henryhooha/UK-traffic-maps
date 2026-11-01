@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.RoadAhead" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#0B1D2E</item>
+        <item name="android:navigationBarColor">#0B1D2E</item>
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+    <color name="bg">#0B1D2E</color>
+    <color name="amber">#FFB300</color>
+</resources>

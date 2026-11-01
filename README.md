@@ -19,7 +19,11 @@ Waze relies on drivers reporting things they've already reached. The motorway co
 - **Drive modes.** GPS (with screen wake-lock and automatic re-route if you go off route) or a simulated drive at 1–30× speed for trying it out.
 - **Live refresh.** Hazards are re-checked every 60 s while driving, because gantry settings change by the minute.
 
-## Quick start
+## Android app (APK, with Android Auto)
+
+There is a standalone Android version in [`android/`](android/README.md). It runs the whole engine on the phone and adds Android Auto support, Waze-style alerts and reporting, speed cameras and turn-by-turn voice. A ready-to-install APK is at `dist/RoadAhead-0.1.0.apk`. See the [Android README](android/README.md) for install steps and the Android Auto developer setting.
+
+## Quick start (web version)
 
 ```bash
 npm install

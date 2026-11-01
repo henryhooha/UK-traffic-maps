@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<d2LogicalModel xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" modelBaseVersion="2">
+  <payloadPublication xsi:type="SituationPublication" lang="en">
+    <situation id="NH-001">
+      <overallSeverity>high</overallSeverity>
+      <situationRecord xsi:type="Accident" id="NH-001-R1" version="3">
+        <situationRecordVersionTime>2026-11-01T16:05:00Z</situationRecordVersionTime>
+        <validity><validityTimeSpecification><overallStartTime>2026-11-01T15:50:00Z</overallStartTime></validityTimeSpecification></validity>
+        <impact>
+          <delays><delayTimeValue>1200</delayTimeValue></delays>
+          <impactDetails><numberOfLanesRestricted>2</numberOfLanesRestricted><originalNumberOfLanes>4</originalNumberOfLanes></impactDetails>
+        </impact>
+        <generalPublicComment><comment><values><value lang="en">M1 northbound between J14 and J15 - Lanes one and two (of four) are closed due to an accident.</value></values></comment></generalPublicComment>
+        <groupOfLocations xsi:type="Linear">
+          <tpegLinearLocation>
+            <tpegDirection>northBound</tpegDirection>
+            <from xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>52.1000</latitude><longitude>-0.8000</longitude></pointCoordinates></from>
+            <to xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>52.1200</latitude><longitude>-0.8100</longitude></pointCoordinates></to>
+          </tpegLinearLocation>
+          <linearExtension><linearByCoordinatesExtension><roadNumber>M1</roadNumber></linearByCoordinatesExtension></linearExtension>
+        </groupOfLocations>
+        <accidentType>collision</accidentType>
+      </situationRecord>
+    </situation>
+    <situation id="NH-002">
+      <situationRecord xsi:type="SpeedManagement" id="NH-002-R1">
+        <generalPublicComment><comment><values><value lang="en">Temporary 50mph limit through roadworks.</value></values></comment></generalPublicComment>
+        <groupOfLocations xsi:type="Point"><pointByCoordinates><bearing>180</bearing><pointCoordinates><latitude>51.5</latitude><longitude>-0.5</longitude></pointCoordinates></pointByCoordinates></groupOfLocations>
+        <speedManagementType>speedRestrictionInOperation</speedManagementType>
+        <temporarySpeedLimit>80</temporarySpeedLimit>
+      </situationRecord>
+    </situation>
+  </payloadPublication>
+</d2LogicalModel>

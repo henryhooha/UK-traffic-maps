@@ -1,0 +1,178 @@
+package uk.roadahead.ui
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.view.WindowManager
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
+import uk.roadahead.core.*
+import uk.roadahead.service.DriveMode
+import uk.roadahead.service.NavController
+import uk.roadahead.service.NavState
+import java.io.File
+
+class MainActivity : AppCompatActivity() {
+    private lateinit var web: WebView
+    private var pageReady = false
+    private var sentRoutes = -1
+    private var sentAnalysis = -1
+
+    private val permLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { res ->
+        if (res[Manifest.permission.ACCESS_FINE_LOCATION] == true) NavController.locateOnce()
+        else if (res.containsKey(Manifest.permission.ACCESS_FINE_LOCATION))
+            Toast.makeText(this, "Precise location is needed for driving alerts", Toast.LENGTH_LONG).show()
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        web = WebView(this)
+        setContentView(web)
+        web.settings.javaScriptEnabled = true
+        web.settings.domStorageEnabled = true
+        web.settings.userAgentString = web.settings.userAgentString + " RoadAheadUK/0.1"
+        web.webChromeClient = WebChromeClient()
+        web.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) { pageReady = true; sentRoutes = -1; sentAnalysis = -1; push(NavController.state.value) }
+        }
+        web.addJavascriptInterface(Bridge(), "Android")
+        web.loadUrl("file:///android_asset/web/index.html")
+
+        askPermissions()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                NavController.state.collect { s ->
+                    push(s)
+                    if (s.mode != DriveMode.NONE) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    delay(250)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                NavController.alerts.collect { a -> js("RA.onAlert(${alertJson(a)})") }
+            }
+        }
+    }
+
+    private fun askPermissions() {
+        val need = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            need += Manifest.permission.ACCESS_FINE_LOCATION; need += Manifest.permission.ACCESS_COARSE_LOCATION
+        }
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+            need += Manifest.permission.POST_NOTIFICATIONS
+        if (need.isNotEmpty()) permLauncher.launch(need.toTypedArray()) else NavController.locateOnce()
+    }
+
+    private fun js(code: String) = runOnUiThread { if (pageReady) web.evaluateJavascript(code, null) }
+    private fun q(s: String) = JSONObject.quote(s)
+
+    private fun alertJson(a: Alert) = JSONObject().put("kind", a.kind.name.lowercase()).put("title", a.title).put("subtitle", a.subtitle)
+        .put("severity", a.severity.name.lowercase()).put("distance", a.distance).putOpt("itemId", a.itemId).put("icon", a.icon).put("key", a.key)
+
+    private fun push(s: NavState) {
+        if (!pageReady) return
+        if (s.routesVersion != sentRoutes) {
+            sentRoutes = s.routesVersion
+            val arr = JSONArray(); s.routes.forEach { arr.put(it.toJson(true)) }
+            js("RA.onRoutes(${arr})")
+            sentAnalysis = -1
+        }
+        if (s.analysisVersion != sentAnalysis) {
+            sentAnalysis = s.analysisVersion
+            val arr = JSONArray(); s.routes.forEach { arr.put(it.toJson(false)) }
+            js("RA.onAnalysis(${JSONObject().putOpt("activeId", s.active?.id).put("routes", arr)})")
+        }
+        val o = JSONObject()
+            .put("along", s.along).putOpt("position", s.position?.toJson()).putOpt("heading", s.heading).putOpt("speedMs", s.speedMs)
+            .putOpt("accuracy", s.accuracy?.toDouble()).put("mode", s.mode.name.lowercase()).putOpt("limit", s.limit)
+            .putOpt("activeId", s.active?.id).putOpt("destination", s.destination?.name)
+            .putOpt("busy", s.busy).putOpt("error", s.error).put("demo", s.demo)
+            .putOpt("lastAlert", s.lastAlert?.let { alertJson(it) })
+            .put("reports", Report.listToJson(s.reports))
+            .put("sources", JSONArray().also { a -> s.sources.forEach { a.put(JSONObject().put("name", it.name).put("count", it.count).putOpt("error", it.error)) } })
+        s.nextStep?.let { st -> o.put("nextStep", JSONObject().put("text", Instructions.text(st)).put("arrow", Instructions.arrow(st)).put("distance", st.from - s.along)) }
+        s.active?.let { r -> o.put("remaining", r.distance - s.along).put("remainingMinutes", r.duration / 60 * (1 - s.along / r.distance) + (r.analysis?.items?.filter { (it.kind == ItemKind.ZONE || it.kind == ItemKind.EVENT) && it.end > s.along }?.sumOf { it.delayMinutes } ?: 0.0))
+            o.putOpt("road", r.roadAt(s.along)?.let { st -> listOfNotNull(st.ref, st.name).joinToString(" · ") }) }
+        s.diversion?.let { d ->
+            o.put("diversion", JSONObject().put("hazard", d.hazard.headline).put("stayMinutes", d.stayMinutes).put("stayDelay", d.stayDelay)
+                .put("options", JSONArray().also { a -> d.options.forEach { r -> a.put(r.toJson(true).put("deltaMinutes", Math.round(r.score - d.stayMinutes))) } }))
+        }
+        js("RA.onState($o)")
+    }
+
+    /** Methods callable from the page as Android.xxx(). */
+    inner class Bridge {
+        @JavascriptInterface fun search(q: String, cb: String) {
+            lifecycleScope.launch {
+                val res = runCatching { NavController.search(q) }
+                val arr = JSONArray()
+                res.getOrNull()?.forEach { arr.put(JSONObject().put("name", it.name).put("location", it.location.toJson())) }
+                js("RA.onResult(${q(cb)}, ${JSONObject().put("results", arr).putOpt("error", res.exceptionOrNull()?.message)})")
+            }
+        }
+        @JavascriptInterface fun plan(json: String) {
+            val o = JSONObject(json)
+            val from = o.optJSONArray("from")?.let { Pt(it.getDouble(0), it.getDouble(1)) }
+            val to = o.getJSONObject("to")
+            val t = to.getJSONArray("location")
+            NavController.plan(from, Place(to.getString("name"), Pt(t.getDouble(0), t.getDouble(1))), o.optBoolean("go"))
+        }
+        @JavascriptInterface fun selectRoute(id: String) = NavController.select(id)
+        @JavascriptInterface fun startDrive(mode: String, simSpeed: Double) {
+            NavController.simSpeed = simSpeed
+            runOnUiThread {
+                if (mode == "gps" && !NavController.hasLocationPermission()) askPermissions()
+                else NavController.startDrive(if (mode == "sim") DriveMode.SIM else DriveMode.GPS)
+            }
+        }
+        @JavascriptInterface fun setSimSpeed(v: Double) { NavController.simSpeed = v }
+        @JavascriptInterface fun stopDrive() = NavController.stopDrive()
+        @JavascriptInterface fun report(type: String) { ReportType.parse(type)?.let { NavController.report(it) } }
+        @JavascriptInterface fun deleteReport(id: String) = NavController.deleteReport(id)
+        @JavascriptInterface fun divert(itemId: String) = NavController.divert(itemId)
+        @JavascriptInterface fun chooseDiversion(i: Int) = NavController.chooseDiversion(i)
+        @JavascriptInterface fun cancelDiversion() = NavController.cancelDiversion()
+        @JavascriptInterface fun dismissAlert() = NavController.dismissAlert()
+        @JavascriptInterface fun clearError() = NavController.clearError()
+        @JavascriptInterface fun refresh() = NavController.refresh(true)
+        @JavascriptInterface fun locate() = runOnUiThread { if (NavController.hasLocationPermission()) NavController.locateOnce() else askPermissions() }
+        @JavascriptInterface fun getSettings(): String = NavController.settings.toJson().toString()
+        @JavascriptInterface fun saveSettings(json: String) { NavController.settings.save(JSONObject(json)); NavController.settingsChanged() }
+        @JavascriptInterface fun shareToOsm(id: String) = NavController.shareReportToOsm(id) { msg -> runOnUiThread { Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show() } }
+        @JavascriptInterface fun openInWaze(lon: Double, lat: Double) = runOnUiThread {
+            // Waze has no public reporting API: open Waze at the spot so you can report it there yourself.
+            val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://waze.com/ul?ll=$lat,$lon&z=16"))
+            runCatching { startActivity(i) }
+        }
+        @JavascriptInterface fun exportReports() = runOnUiThread {
+            val f = File(cacheDir, "road-ahead-reports.gpx")
+            f.writeText(Report.toGpx(NavController.state.value.reports))
+            val uri = FileProvider.getUriForFile(this@MainActivity, "$packageName.files", f)
+            startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/gpx+xml").putExtra(Intent.EXTRA_STREAM, uri)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "Export reports"))
+        }
+    }
+}
