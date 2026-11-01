@@ -295,16 +295,16 @@
             <li>${ok(a.location)} Precise location allowed</li>
             <li>${a.fromPlay ? '✅' : '⚠️'} Installed ${a.fromPlay ? 'from Play Store' : 'outside the Play Store (sideloaded)'} ${a.fromPlay ? '' : '— Android Auto hides these until <b>Unknown sources</b> is on'}</li>
           </ul>
-          <h4>Make Road Ahead appear in the car</h4>
+          <h4>What works with Android Auto 17.9+</h4>
+          <p>Google now hides sideloaded <b>car-screen</b> apps in Android Auto even with Unknown sources on, so Road Ahead's own car screen only appears if it's installed from the Play Store.</p>
+          <p><b>What does work:</b> Road Ahead's alerts arrive in the car as <b>messages from "Road Ahead"</b>, shown on the car screen and read aloud, while you navigate with Waze or Google Maps:</p>
           <ol class="steps">
-            <li>Tap <b>Open Android Auto settings</b> below (or Settings → search "Android Auto").</li>
-            <li>Scroll down to the bottom and tap <b>Version</b> about 10 times → OK to enable developer settings.</li>
-            <li>Tap <b>⋮</b> (top right) → <b>Developer settings</b> → tick <b>Unknown sources</b>.</li>
-            <li><b>Force-stop Android Auto</b> (Settings → Apps → Android Auto → Force stop), or restart the phone, so it rescans apps.</li>
-            <li>Back in Android Auto settings → <b>Display</b> → <b>Customise launcher</b>: make sure <b>Road Ahead</b> is ticked.</li>
-            <li>Reconnect to the car. Road Ahead appears in the app grid (it may be on the second page).</li>
+            <li>Before setting off, plan the same destination here and tap <b>Go</b>. It keeps running in the background.</li>
+            <li>Start Waze or Maps in the car as normal.</li>
+            <li>Hazards, gantry closures and cameras ahead appear as Road Ahead messages. Voice alerts also play through the car speakers.</li>
+            <li>To report: tap <b>Reply</b> on the message and say e.g. "car stopped", "accident", "lane blocked", "police" or "mobile camera".</li>
+            <li>For message alerts to show: Android Auto settings → <b>Messaging</b> → turn on <b>Show message notifications</b>. Also keep <b>Unknown sources</b> on in Developer settings.</li>
           </ol>
-          <p class="muted small">Still missing? Make sure Road Ahead isn't installed in a Work profile or Secure Folder, and that the car's Android Auto isn't limited to a set list of apps by the manufacturer.</p>
           <button class="btn primary full" id="open-aa">Open Android Auto settings</button>`;
         $('open-aa').onclick = () => call('openAutoSettings');
         break;

@@ -41,6 +41,8 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
+        <receiver android:name=".service.AlertActionReceiver" android:exported="false" />
+
         <!-- Android Auto -->
         <service
             android:name=".car.RoadAheadCarService"

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <automotiveApp>
     <uses name="template" />
+    <!-- Messaging-style alerts: shown and read aloud by Android Auto even for sideloaded apps -->
+    <uses name="notification" />
 </automotiveApp>

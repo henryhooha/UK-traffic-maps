@@ -19,7 +19,7 @@ A standalone Android app. No server is needed: the "road ahead" engine runs on t
 
 ## Install the APK
 
-1. Copy `RoadAhead-0.1.2.apk` (in `dist/` at the repo root) to your phone, or download it there.
+1. Copy `RoadAhead-0.1.3.apk` (in `dist/` at the repo root) to your phone, or download it there.
 2. Open it. Android will ask you to allow "Install unknown apps" for your browser or file manager. Allow it, then tap **Install**.
 3. Open **Road Ahead** and allow:
    - **Location: Precise, While using the app.** GPS precision is required for lane-level warnings, the same as Waze.
@@ -31,6 +31,12 @@ Requires Android 8.0+. Built and signed for sideloading, not the Play Store.
 **Signing key:** Android only installs an update over the top if it's signed with the same key. The key isn't in git (it's a credential). Keep the `roadahead-personal.jks` keystore you were given, put it in `android/keystore/`, and create `android/keystore.properties` with `storeFile`, `storePassword`, `keyAlias` and `keyPassword`. Without it, builds use a debug key, and you'd have to uninstall the old app (losing your saved reports) before installing.
 
 ## Android Auto
+
+> **Android Auto 17.9 and later hide sideloaded car-screen apps, even with Unknown sources on.** That is Google's restriction (see [this report](https://github.com/prototux/lapin/issues/1)). Road Ahead's own car screen only appears if it's installed from the Play Store, for example through a Play Console internal-testing track.
+>
+> **What works without the Play Store:** run Road Ahead on the phone, and navigate with Waze or Google Maps in the car. Hazard, gantry and camera alerts arrive as **messages from "Road Ahead"**. Android Auto shows them on the car screen and reads them aloud. Tap **Reply** and say "car stopped", "accident", "lane blocked", "police" or "mobile camera" to file a report. Turn on Android Auto settings → Messaging → **Show message notifications**.
+>
+> The steps below still apply on older Android Auto versions, and once the app is installed from Play.
 
 In the app, ☰ → **Android Auto setup** checks your phone and walks you through these steps.
 

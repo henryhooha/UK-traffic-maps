@@ -134,4 +134,14 @@ class CoreTest {
         assertEquals(r, back); assertTrue(back.active(System.currentTimeMillis()))
         assertTrue(Report.toGpx(listOf(r)).contains("Fixed camera"))
     }
+
+    @Test fun spokenReports() {
+        assertEquals(ReportType.STOPPED_VEHICLE, ReportType.fromSpeech("Broken down car on the hard shoulder"))
+        assertEquals(ReportType.MOBILE_CAMERA, ReportType.fromSpeech("mobile camera van"))
+        assertEquals(ReportType.SPEED_CAMERA, ReportType.fromSpeech("speed camera"))
+        assertEquals(ReportType.ACCIDENT, ReportType.fromSpeech("crash ahead"))
+        assertEquals(ReportType.LANE_BLOCKED, ReportType.fromSpeech("lane two blocked"))
+        assertEquals(ReportType.TRAFFIC, ReportType.fromSpeech("traffic jam"))
+        assertNull(ReportType.fromSpeech("hello"))
+    }
 }

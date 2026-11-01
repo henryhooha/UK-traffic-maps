@@ -8,6 +8,9 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.Person
+import androidx.core.app.RemoteInput
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
@@ -69,16 +72,19 @@ class DriveService : LifecycleService() {
         .addAction(0, "Stop", PendingIntent.getService(this, 1, Intent(this, DriveService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE))
         .build()
 
+    /**
+     * Hazard alerts are posted as a messaging-style conversation from
+     * "Road Ahead". Android Auto (17.9+) hides sideloaded car apps, but still
+     * shows and reads aloud messaging notifications — so alerts reach the car
+     * screen even while you navigate with Waze or Google Maps. Replying by
+     * voice ("accident", "car stopped", "mobile camera"…) files a report.
+     */
     @Suppress("FunctionName")
     private fun heads_up(title: String, text: String, itemId: String?) {
-        val n = NotificationCompat.Builder(this, App.CH_ALERTS)
-            .setSmallIcon(R.drawable.ic_notify).setContentTitle(title).setContentText(text)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setPriority(NotificationCompat.PRIORITY_HIGH).setCategory(NotificationCompat.CATEGORY_NAVIGATION)
-            .setAutoCancel(true).setTimeoutAfter(45_000).setContentIntent(openApp())
-            .extend(androidx.car.app.notification.CarAppExtender.Builder().setContentTitle(title).setContentText(text).build())
-            .build()
-        nm.notify(NOTIF_ALERT, n)
+        val now = System.currentTimeMillis()
+        recent.addLast(Triple("$title${if (text.isNotBlank()) " — $text" else ""}", now, itemId))
+        while (recent.size > 5) recent.removeFirst()
+        nm.notify(NOTIF_ALERT, alertNotification(this, recent.toList()))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -88,9 +94,36 @@ class DriveService : LifecycleService() {
     }
 
 
+    private val recent = ArrayDeque<Triple<String, Long, String?>>()
+
     companion object {
         private const val NOTIF_DRIVE = 1
-        private const val NOTIF_ALERT = 2
+        const val NOTIF_ALERT = 2
+
+        fun alertNotification(ctx: Context, msgs: List<Triple<String, Long, String?>>): Notification {
+            val bot = Person.Builder().setName("Road Ahead").setKey("road-ahead").setBot(true)
+                .setIcon(IconCompat.createWithResource(ctx, R.drawable.ic_notify)).build()
+            val me = Person.Builder().setName("You").setKey("me").build()
+            val style = NotificationCompat.MessagingStyle(me).setConversationTitle("Road Ahead alerts").setGroupConversation(false)
+            msgs.forEach { (t, time, _) -> style.addMessage(t, time, bot) }
+            val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            val reply = NotificationCompat.Action.Builder(R.drawable.ic_report, "Report",
+                PendingIntent.getBroadcast(ctx, 10, Intent(ctx, AlertActionReceiver::class.java).setAction(AlertActionReceiver.ACTION_REPLY), flags))
+                .addRemoteInput(RemoteInput.Builder(AlertActionReceiver.KEY_TEXT).setLabel("Report (e.g. \"car stopped\")").build())
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY).setShowsUserInterface(false).build()
+            val read = NotificationCompat.Action.Builder(R.drawable.ic_stop, "Got it",
+                PendingIntent.getBroadcast(ctx, 11, Intent(ctx, AlertActionReceiver::class.java).setAction(AlertActionReceiver.ACTION_READ), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_MARK_AS_READ).setShowsUserInterface(false).build()
+            return NotificationCompat.Builder(ctx, App.CH_ALERTS)
+                .setSmallIcon(R.drawable.ic_notify).setStyle(style)
+                .setContentTitle("Road Ahead").setContentText(msgs.lastOrNull()?.first ?: "")
+                .setPriority(NotificationCompat.PRIORITY_HIGH).setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setOnlyAlertOnce(false).setAutoCancel(true).setTimeoutAfter(10 * 60_000)
+                .setContentIntent(PendingIntent.getActivity(ctx, 0, Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE))
+                .addAction(reply).addInvisibleAction(read)
+                .build()
+        }
+
         private const val ACTION_STOP = "stop"
         fun start(ctx: Context) = runCatching { ContextCompat.startForegroundService(ctx, Intent(ctx, DriveService::class.java)) }
         fun stop(ctx: Context) { ctx.stopService(Intent(ctx, DriveService::class.java)) }

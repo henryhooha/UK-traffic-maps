@@ -18,7 +18,28 @@ enum class ReportType(val eventType: EventType, val label: String, val ttlMinute
     CLOSURE(EventType.CLOSURE, "Road closed", 240, Severity.SEVERE);
 
     val icon get() = eventType.icon
-    companion object { fun parse(s: String?) = entries.firstOrNull { it.name.equals(s, true) } }
+    companion object {
+        fun parse(s: String?) = entries.firstOrNull { it.name.equals(s, true) }
+
+        /** Map a spoken reply ("broken down car in lane one") to a report type. */
+        fun fromSpeech(text: String?): ReportType? {
+            val t = (text ?: "").lowercase()
+            return when {
+                Regex("mobile|speed trap|van").containsMatchIn(t) -> MOBILE_CAMERA
+                Regex("camera").containsMatchIn(t) -> SPEED_CAMERA
+                Regex("police|cop").containsMatchIn(t) -> POLICE
+                Regex("accident|crash|collision|smash").containsMatchIn(t) -> ACCIDENT
+                Regex("broke|breakdown|stopped|stationary|car on|vehicle").containsMatchIn(t) -> STOPPED_VEHICLE
+                Regex("lane").containsMatchIn(t) -> LANE_BLOCKED
+                Regex("object|debris|tyre|tire|animal|something in").containsMatchIn(t) -> OBJECT
+                Regex("traffic|jam|queue|slow|standstill").containsMatchIn(t) -> TRAFFIC
+                Regex("road ?works|works|cones").containsMatchIn(t) -> ROADWORKS
+                Regex("fog|ice|icy|flood|snow|weather|spray").containsMatchIn(t) -> WEATHER
+                Regex("closed|closure").containsMatchIn(t) -> CLOSURE
+                else -> null
+            }
+        }
+    }
 }
 
 data class Report(
