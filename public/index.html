@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1d2e" />
+  <title>Road Ahead UK</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="map" aria-label="Map"></div>
+
+  <!-- Look-ahead alert banner (shown while driving) -->
+  <div id="alert" class="alert hidden" role="alert" aria-live="assertive">
+    <div class="alert-body">
+      <div class="alert-dist" id="alert-dist"></div>
+      <div class="alert-main">
+        <div class="alert-title" id="alert-title"></div>
+        <div class="alert-sub" id="alert-sub"></div>
+        <div id="alert-sign"></div>
+      </div>
+    </div>
+    <div class="alert-actions">
+      <button id="alert-divert" class="btn btn-warn">Find a diversion</button>
+      <button id="alert-dismiss" class="btn btn-ghost">Stay on route</button>
+    </div>
+  </div>
+
+  <aside id="panel" class="panel">
+    <header class="panel-head">
+      <div class="brand"><span class="logo">▲</span> Road Ahead <small>UK</small></div>
+      <span id="demo-badge" class="badge badge-demo hidden" title="No live National Highways signal feed configured — smart motorway gantries and incidents on motorways are simulated">DEMO DATA</span>
+      <button id="panel-toggle" class="btn btn-icon" aria-label="Collapse panel">▾</button>
+    </header>
+
+    <div class="panel-body">
+      <form id="route-form" class="route-form" autocomplete="off">
+        <div class="field">
+          <label for="from">From</label>
+          <div class="input-row">
+            <input id="from" placeholder="Start — town, postcode, or use GPS" />
+            <button type="button" id="use-gps" class="btn btn-icon" title="Use my location">◎</button>
+          </div>
+          <ul class="suggest" id="from-suggest"></ul>
+        </div>
+        <div class="field">
+          <label for="to">To</label>
+          <input id="to" placeholder="Destination" />
+          <ul class="suggest" id="to-suggest"></ul>
+        </div>
+        <button class="btn btn-primary" id="go">Plan route</button>
+      </form>
+
+      <div id="routes" class="routes"></div>
+
+      <section id="drive-controls" class="drive hidden">
+        <div class="drive-row">
+          <button id="drive-gps" class="btn btn-primary">▶ Drive (GPS)</button>
+          <button id="drive-sim" class="btn">▶ Simulate drive</button>
+          <select id="sim-speed" title="Simulation speed">
+            <option value="1">1×</option><option value="4">4×</option><option value="10" selected>10×</option><option value="30">30×</option>
+          </select>
+        </div>
+        <div class="drive-row settings">
+          <label>Warn me <select id="horizon">
+            <option value="5">5 mi</option><option value="10" selected>10 mi</option><option value="15">15 mi</option><option value="25">25 mi</option>
+          </select> ahead</label>
+          <label><input type="checkbox" id="voice" checked /> Voice</label>
+          <label><input type="checkbox" id="minor" /> Minor items</label>
+        </div>
+      </section>
+
+      <section id="ahead" class="ahead hidden">
+        <h2>Road ahead <span id="ahead-meta"></span></h2>
+        <ol id="ahead-list" class="ahead-list"></ol>
+      </section>
+
+      <section id="diversions" class="diversions hidden"></section>
+
+      <footer class="sources" id="sources"></footer>
+    </div>
+  </aside>
+
+  <div id="hud" class="hud hidden">
+    <div class="hud-speed"><span id="hud-limit">–</span><small>limit</small></div>
+    <div class="hud-info"><div id="hud-road">–</div><div id="hud-eta">–</div></div>
+    <button id="hud-stop" class="btn btn-ghost">■ Stop</button>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

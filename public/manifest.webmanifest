@@ -1,0 +1,10 @@
+{
+  "name": "Road Ahead UK",
+  "short_name": "Road Ahead",
+  "description": "UK traffic and directions with smart motorway look-ahead",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1d2e",
+  "theme_color": "#0b1d2e",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

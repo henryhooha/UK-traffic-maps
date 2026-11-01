@@ -1,0 +1,27 @@
+{
+  "name": "uk-road-ahead",
+  "version": "1.0.0",
+  "description": "UK traffic & directions with smart-motorway look-ahead",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/henryhooha/UK-traffic-maps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/henryhooha/UK-traffic-maps/issues"
+  },
+  "homepage": "https://github.com/henryhooha/UK-traffic-maps#readme",
+  "dependencies": {
+    "fast-xml-parser": "^4.5.0"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  }
+}
