@@ -19,7 +19,7 @@ A standalone Android app. No server is needed: the "road ahead" engine runs on t
 
 ## Install the APK
 
-1. Copy `RoadAhead-0.1.1.apk` (in `dist/` at the repo root) to your phone, or download it there.
+1. Copy `RoadAhead-0.1.2.apk` (in `dist/` at the repo root) to your phone, or download it there.
 2. Open it. Android will ask you to allow "Install unknown apps" for your browser or file manager. Allow it, then tap **Install**.
 3. Open **Road Ahead** and allow:
    - **Location: Precise, While using the app.** GPS precision is required for lane-level warnings, the same as Waze.
@@ -32,12 +32,15 @@ Requires Android 8.0+. Built and signed for sideloading, not the Play Store.
 
 ## Android Auto
 
+In the app, ☰ → **Android Auto setup** checks your phone and walks you through these steps.
+
 Android Auto only shows sideloaded apps once you enable developer "unknown sources":
 
 1. On the phone open **Android Auto settings**. Usually Settings → Connected devices → Connection preferences → Android Auto; on some phones search Settings for "Android Auto".
 2. Scroll to the bottom and tap **Version** about 10 times until it asks to enable developer settings. Accept.
 3. Tap ⋮ (top right) → **Developer settings** → tick **Unknown sources**.
-4. Connect to the car (or start Android Auto). **Road Ahead** appears in the app launcher. You may need to customise the launcher to show it.
+4. **Force-stop Android Auto** (Settings → Apps → Android Auto → Force stop) or restart the phone, so it rescans for apps. Then in Android Auto settings → Display → **Customise launcher**, make sure Road Ahead is ticked.
+5. Connect to the car (or start Android Auto). **Road Ahead** appears in the app launcher. You may need to customise the launcher to show it.
 
 On the car screen:
 - **Search** (recent destinations first): picking one plans the route and starts navigating.
