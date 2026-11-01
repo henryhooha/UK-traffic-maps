@@ -19,7 +19,7 @@ A standalone Android app. No server is needed: the "road ahead" engine runs on t
 
 ## Install the APK
 
-1. Copy `RoadAhead-0.1.0.apk` (in `dist/` at the repo root) to your phone, or download it there.
+1. Copy `RoadAhead-0.1.1.apk` (in `dist/` at the repo root) to your phone, or download it there.
 2. Open it. Android will ask you to allow "Install unknown apps" for your browser or file manager. Allow it, then tap **Install**.
 3. Open **Road Ahead** and allow:
    - **Location: Precise, While using the app.** GPS precision is required for lane-level warnings, the same as Waze.

@@ -1,4 +1,4 @@
-:root { --bg: #0b1d2e; --card: #fff; --ink: #14212e; --muted: #5d6b79; --line: #dfe5eb; --accent: #1e88e5;
+:root { --sat: 0px; --sab: 0px; --sal: 0px; --sar: 0px; --bg: #0b1d2e; --card: #fff; --ink: #14212e; --muted: #5d6b79; --line: #dfe5eb; --accent: #1e88e5;
   --low: #78909c; --medium: #f9a825; --high: #ef6c00; --severe: #d32f2f; --turn: #2e7d32;
   font-family: system-ui, -apple-system, Roboto, sans-serif; color: var(--ink); -webkit-tap-highlight-color: transparent; }
 @media (prefers-color-scheme: dark) { :root { --card: #16222e; --ink: #e8eef4; --muted: #9aaab8; --line: #2a3d50; } }
@@ -9,7 +9,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); }
 .muted { color: var(--muted); } .small { font-size: 12px; } .good { color: #2e7d32; font-weight: 700; } .bad { color: var(--high); font-weight: 700; }
 .card { background: var(--card); border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,.25); }
 
-#top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 10px 0; z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+#top { position: fixed; top: 0; left: 0; right: 0; padding: calc(var(--sat) + 8px) calc(var(--sar) + 10px) 0 calc(var(--sal) + 10px); z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 #top > * { pointer-events: auto; }
 #searchbar { display: flex; align-items: center; padding: 4px; }
 #dest { flex: 1; border: 0; background: transparent; font-size: 17px; padding: 12px 6px; color: var(--ink); outline: none; }
@@ -40,20 +40,20 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); }
 .btn.full { width: 100%; margin: 4px 0; text-align: left; }
 
 .fab { position: fixed; z-index: 1001; border: 0; border-radius: 50%; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
-.fab.report { right: 16px; bottom: 28px; width: 68px; height: 68px; background: #ff9800; color: #fff; font-size: 32px; }
+.fab.report { right: calc(var(--sar) + 16px); bottom: calc(var(--sab) + 28px); width: 68px; height: 68px; background: #ff9800; color: #fff; font-size: 32px; }
 .fab.small { right: 22px; width: 52px; height: 52px; background: var(--card); color: var(--ink); font-size: 22px; }
-#recenter { bottom: 180px; } #ahead-btn { bottom: 110px; }
+#recenter { bottom: calc(var(--sab) + 180px); } #ahead-btn { bottom: calc(var(--sab) + 110px); }
 #ahead-count { position: absolute; top: -4px; right: -4px; background: var(--severe); color: #fff; font-size: 12px; border-radius: 10px; min-width: 20px; padding: 1px 5px; }
 #ahead-count:empty { display: none; }
-body.driving .fab.report { bottom: 100px; } body.driving #ahead-btn { bottom: 180px; } body.driving #recenter { bottom: 250px; }
+body.driving .fab.report { bottom: calc(var(--sab) + 100px); } body.driving #ahead-btn { bottom: calc(var(--sab) + 180px); } body.driving #recenter { bottom: calc(var(--sab) + 250px); }
 
-#hud { position: fixed; left: 10px; right: 96px; bottom: 16px; z-index: 1000; background: var(--card); border-radius: 18px; box-shadow: 0 4px 18px rgba(0,0,0,.3); display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+#hud { position: fixed; left: calc(var(--sal) + 10px); right: calc(var(--sar) + 96px); bottom: calc(var(--sab) + 16px); z-index: 1000; background: var(--card); border-radius: 18px; box-shadow: 0 4px 18px rgba(0,0,0,.3); display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
 .limit { width: 54px; height: 54px; border-radius: 50%; background: #fff; border: 6px solid #e53935; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; color: #000; flex: none; }
 #speed { display: flex; flex-direction: column; align-items: center; min-width: 44px; } #speed b { font-size: 24px; } #speed small { font-size: 10px; color: var(--muted); }
 #speed.over b { color: var(--severe); }
 #hud-info { flex: 1; min-width: 0; font-size: 13px; } #road { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-#sheet { position: fixed; left: 0; right: 0; bottom: 0; max-height: 72vh; overflow-y: auto; z-index: 1100; background: var(--card); border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,.3); padding: 6px 14px 24px; }
+#sheet { position: fixed; left: 0; right: 0; bottom: 0; max-height: calc(72vh - var(--sat)); overflow-y: auto; z-index: 1100; background: var(--card); border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,.3); padding: 6px calc(var(--sar) + 14px) calc(var(--sab) + 24px) calc(var(--sal) + 14px); }
 .grab { width: 48px; height: 5px; background: var(--line); border-radius: 3px; margin: 4px auto 8px; padding: 6px 0; background-clip: content-box; }
 #sheet h3 { margin: 4px 0 10px; } #sheet h4 { margin: 14px 0 4px; }
 .route { display: block; width: 100%; text-align: left; font: inherit; color: inherit; background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
@@ -84,7 +84,7 @@ body.driving .fab.report { bottom: 100px; } body.driving #ahead-btn { bottom: 18
 #busy { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 1300; background: rgba(20,30,40,.9); color: #fff; padding: 14px 20px; border-radius: 12px; display: flex; gap: 12px; align-items: center; }
 .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-#toast { position: fixed; bottom: 190px; left: 50%; transform: translateX(-50%); z-index: 1400; background: #263238; color: #fff; padding: 10px 16px; border-radius: 10px; max-width: 90vw; text-align: center; }
+#toast { position: fixed; bottom: calc(var(--sab) + 190px); left: 50%; transform: translateX(-50%); z-index: 1400; background: #263238; color: #fff; padding: 10px 16px; border-radius: 10px; max-width: 90vw; text-align: center; }
 
 /* map markers */
 .ev { display: flex !important; align-items: center; justify-content: center; font-size: 16px; background: #fff; border-radius: 50%; border: 3px solid var(--low); box-shadow: 0 2px 6px rgba(0,0,0,.35); }
@@ -107,3 +107,8 @@ body.driving .fab.report { bottom: 100px; } body.driving #ahead-btn { bottom: 18
 .gantry-icon { background: none; border: none; } .gantry-icon .gantry { transform: translate(-50%, -110%); }
 .gantry-dot { display: none; }
 .vms { background: #000; color: #ffb300; font-family: monospace; font-weight: 700; text-align: center; padding: 6px 10px; border-radius: 4px; margin: 4px 0; display: inline-block; min-width: 150px; }
+
+/* Dark strip behind the phone's status bar so its icons stay readable over the map. */
+#statusbar-bg { position: fixed; top: 0; left: 0; right: 0; height: var(--sat); background: rgba(11,29,46,.88); z-index: 1500; pointer-events: none; }
+/* Keep the map attribution above the gesture/navigation bar. */
+.leaflet-bottom { bottom: var(--sab); } .leaflet-left { left: var(--sal); } .leaflet-right { right: var(--sar); }

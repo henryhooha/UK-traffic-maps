@@ -17,6 +17,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private var pageReady = false
     private var sentRoutes = -1
     private var sentAnalysis = -1
+    private var insetsJs = ""
 
     private val permLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { res ->
         if (res[Manifest.permission.ACCESS_FINE_LOCATION] == true) NavController.locateOnce()
@@ -47,12 +51,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         web = WebView(this)
         setContentView(web)
+        // Android 15 draws apps edge-to-edge (behind the status and navigation
+        // bars). Keep the map full-screen but tell the page how big the bars
+        // are so the controls sit clear of them.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, web).isAppearanceLightStatusBars = false
+        ViewCompat.setOnApplyWindowInsetsListener(web) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val d = resources.displayMetrics.density
+            fun px(v: Int) = "${(v / d).toInt()}px"
+            insetsJs = "(function(s){s.setProperty('--sat','${px(bars.top)}');s.setProperty('--sab','${px(maxOf(bars.bottom, ime.bottom))}');" +
+                "s.setProperty('--sal','${px(bars.left)}');s.setProperty('--sar','${px(bars.right)}');})(document.documentElement.style)"
+            js(insetsJs)
+            insets
+        }
         web.settings.javaScriptEnabled = true
         web.settings.domStorageEnabled = true
         web.settings.userAgentString = web.settings.userAgentString + " RoadAheadUK/0.1"
         web.webChromeClient = WebChromeClient()
         web.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) { pageReady = true; sentRoutes = -1; sentAnalysis = -1; push(NavController.state.value) }
+            override fun onPageFinished(view: WebView?, url: String?) { pageReady = true; if (insetsJs.isNotEmpty()) web.evaluateJavascript(insetsJs, null); sentRoutes = -1; sentAnalysis = -1; push(NavController.state.value) }
         }
         web.addJavascriptInterface(Bridge(), "Android")
         web.loadUrl("file:///android_asset/web/index.html")
