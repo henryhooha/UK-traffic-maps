@@ -276,10 +276,37 @@
           <button class="btn full" id="m-reports">📍 My reports (${(st.reports || []).length})</button>
           <button class="btn full" id="m-settings">⚙ Settings &amp; data feeds</button>
           <button class="btn full" id="m-refresh">↻ Refresh live data</button>
+          <button class="btn full" id="m-auto">🚗 Android Auto setup</button>
           <h4>Live data</h4><ul class="small">${src || '<li>Not loaded yet</li>'}<li>OpenStreetMap: speed cameras, junction numbers</li>${st.demo ? '<li><span class="badge">DEMO</span> smart-motorway simulator on</li>' : ''}</ul>`;
         $('m-reports').onclick = () => openSheet('reports');
         $('m-settings').onclick = () => openSheet('settings');
         $('m-refresh').onclick = () => { call('refresh'); toast('Refreshing…'); };
+        $('m-auto').onclick = () => openSheet('auto');
+        break;
+      }
+      case 'auto': {
+        let a = {};
+        try { a = JSON.parse(call('autoStatus') || '{}'); } catch (e) { /* ignore */ }
+        const ok = (b) => (b ? '✅' : '❌');
+        body.innerHTML = `<h3>Android Auto setup</h3>
+          <ul class="checks">
+            <li>${ok(a.aaInstalled)} Android Auto on this phone${a.aaVersion ? ` (v${esc(a.aaVersion)})` : ''}</li>
+            <li>${ok(a.serviceOk)} Road Ahead's car service is registered</li>
+            <li>${ok(a.location)} Precise location allowed</li>
+            <li>${a.fromPlay ? '✅' : '⚠️'} Installed ${a.fromPlay ? 'from Play Store' : 'outside the Play Store (sideloaded)'} ${a.fromPlay ? '' : '— Android Auto hides these until <b>Unknown sources</b> is on'}</li>
+          </ul>
+          <h4>Make Road Ahead appear in the car</h4>
+          <ol class="steps">
+            <li>Tap <b>Open Android Auto settings</b> below (or Settings → search "Android Auto").</li>
+            <li>Scroll down to the bottom and tap <b>Version</b> about 10 times → OK to enable developer settings.</li>
+            <li>Tap <b>⋮</b> (top right) → <b>Developer settings</b> → tick <b>Unknown sources</b>.</li>
+            <li><b>Force-stop Android Auto</b> (Settings → Apps → Android Auto → Force stop), or restart the phone, so it rescans apps.</li>
+            <li>Back in Android Auto settings → <b>Display</b> → <b>Customise launcher</b>: make sure <b>Road Ahead</b> is ticked.</li>
+            <li>Reconnect to the car. Road Ahead appears in the app grid (it may be on the second page).</li>
+          </ol>
+          <p class="muted small">Still missing? Make sure Road Ahead isn't installed in a Work profile or Secure Folder, and that the car's Android Auto isn't limited to a set list of apps by the manufacturer.</p>
+          <button class="btn primary full" id="open-aa">Open Android Auto settings</button>`;
+        $('open-aa').onclick = () => call('openAutoSettings');
         break;
       }
       case 'reports': {

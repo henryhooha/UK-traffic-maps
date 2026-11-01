@@ -33,6 +33,8 @@ import uk.roadahead.service.NavController
 import uk.roadahead.service.NavState
 import java.io.File
 
+private const val AA_PKG = "com.google.android.projection.gearhead"
+
 class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
     private var pageReady = false
@@ -185,6 +187,31 @@ class MainActivity : AppCompatActivity() {
             // Waze has no public reporting API: open Waze at the spot so you can report it there yourself.
             val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://waze.com/ul?ll=$lat,$lon&z=16"))
             runCatching { startActivity(i) }
+        }
+        /** Diagnostics for "the app doesn't appear in Android Auto". */
+        @JavascriptInterface fun autoStatus(): String {
+            val pm = packageManager
+            val aa = runCatching { pm.getPackageInfo(AA_PKG, 0) }.getOrNull()
+            val svc = pm.queryIntentServices(Intent("androidx.car.app.CarAppService").setPackage(packageName), 0)
+            val installer = runCatching {
+                if (Build.VERSION.SDK_INT >= 30) pm.getInstallSourceInfo(packageName).installingPackageName
+                else @Suppress("DEPRECATION") pm.getInstallerPackageName(packageName)
+            }.getOrNull()
+            return JSONObject().put("aaInstalled", aa != null).putOpt("aaVersion", aa?.versionName)
+                .put("serviceOk", svc.isNotEmpty()).putOpt("installer", installer)
+                .put("fromPlay", installer == "com.android.vending")
+                .put("location", NavController.hasLocationPermission()).toString()
+        }
+        @JavascriptInterface fun openAutoSettings() = runOnUiThread {
+            // Android Auto has no public settings intent; try its own entry points, then its app-info page.
+            val tries = listOf(
+                Intent().setClassName(AA_PKG, "com.google.android.apps.auto.carservice.settings.SettingsActivity"),
+                Intent().setClassName(AA_PKG, "com.google.android.projection.gearhead.companion.settings.SettingsActivity"),
+                packageManager.getLaunchIntentForPackage(AA_PKG),
+                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$AA_PKG")),
+            )
+            for (i in tries.filterNotNull()) if (runCatching { startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess) return@runOnUiThread
+            Toast.makeText(this@MainActivity, "Open Settings and search for \"Android Auto\"", Toast.LENGTH_LONG).show()
         }
         @JavascriptInterface fun exportReports() = runOnUiThread {
             val f = File(cacheDir, "road-ahead-reports.gpx")

@@ -112,3 +112,6 @@ body.driving .fab.report { bottom: calc(var(--sab) + 100px); } body.driving #ahe
 #statusbar-bg { position: fixed; top: 0; left: 0; right: 0; height: var(--sat); background: rgba(11,29,46,.88); z-index: 1500; pointer-events: none; }
 /* Keep the map attribution above the gesture/navigation bar. */
 .leaflet-bottom { bottom: var(--sab); } .leaflet-left { left: var(--sal); } .leaflet-right { right: var(--sar); }
+
+.checks { list-style: none; padding: 0; margin: 0 0 8px; } .checks li { padding: 5px 0; }
+.steps { padding-left: 20px; } .steps li { margin: 6px 0; }
