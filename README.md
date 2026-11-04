@@ -21,7 +21,7 @@ Waze relies on drivers reporting things they've already reached. The motorway co
 
 ## Android app (APK, with Android Auto)
 
-There is a standalone Android version in [`android/`](android/README.md). It runs the whole engine on the phone and adds Android Auto support, Waze-style alerts and reporting, speed cameras and turn-by-turn voice. A ready-to-install APK is at `dist/RoadAhead-0.1.3.apk`. See the [Android README](android/README.md) for install steps and the Android Auto developer setting.
+There is a standalone Android version in [`android/`](android/README.md). It runs the whole engine on the phone and adds Android Auto support, Waze-style alerts and reporting, speed cameras and turn-by-turn voice. Each release is in `dist/<version>/`: an `.apk` for testing/sideloading and an `.aab` for Google Play (older versions are kept). The latest is `dist/0.1.4/`. See the [Android README](android/README.md) for install steps and the Android Auto developer setting.
 
 ## Quick start (web version)
 

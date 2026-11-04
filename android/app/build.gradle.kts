@@ -5,16 +5,18 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val versionProps = Properties().apply { rootProject.file("version.properties").inputStream().use { load(it) } }
+
 android {
     namespace = "uk.roadahead"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "uk.roadahead"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 4
-        versionName = "0.1.3"
+        targetSdk = 36
+        versionCode = versionProps.getProperty("versionCode").toInt()
+        versionName = versionProps.getProperty("versionName")
     }
 
     // Signing key for sideloading. Kept OUT of git: put the keystore in

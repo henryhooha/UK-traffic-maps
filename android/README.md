@@ -19,7 +19,7 @@ A standalone Android app. No server is needed: the "road ahead" engine runs on t
 
 ## Install the APK
 
-1. Copy `RoadAhead-0.1.3.apk` (in `dist/` at the repo root) to your phone, or download it there.
+1. Copy the latest `RoadAhead-<version>.apk` from `dist/<version>/` at the repo root (currently `dist/0.1.4/RoadAhead-0.1.4.apk`) to your phone, or download it there.
 2. Open it. Android will ask you to allow "Install unknown apps" for your browser or file manager. Allow it, then tap **Install**.
 3. Open **Road Ahead** and allow:
    - **Location: Precise, While using the app.** GPS precision is required for lane-level warnings, the same as Waze.
@@ -94,13 +94,25 @@ Tap ☰ in the app to change:
 - extra DATEX II URLs
 - the routing, search and Overpass servers
 
+## Publishing on Google Play
+
+Upload `dist/<version>/RoadAhead-<version>.aab` (it's built for API 36, which Play requires). Things the Play Console will ask for:
+
+1. **Developer account**: a one-off $25 fee at play.google.com/console.
+2. **App signing**: accept **Play App Signing**. Your `roadahead-personal.jks` becomes the *upload key*, so keep it safe; every future `.aab` must be signed with it.
+3. **Privacy policy URL**: required because the app uses location. A draft is in [`docs/privacy-policy.md`](../docs/privacy-policy.md). Publish it somewhere public (e.g. GitHub Pages) and paste the link. Add your contact email.
+4. **Data safety form**: precise location (collected, used for app functionality, not shared, not stored off-device). No other personal data.
+5. **Foreground service declaration**: the app uses a *location* foreground service during an active drive. Play asks for a short explanation and a video showing it.
+6. **Android Auto**: in Advanced settings → Form factors, add **Android Auto**. Google reviews car apps against its driver-distraction quality rules before they reach cars, so expect feedback on the first submission.
+7. **Testing first**: start with an **Internal testing** track. Up to 100 testers (you), installed from Play, which also makes the car screen appear in Android Auto.
+
 ## Building it yourself
 
 ```bash
 cd android
 echo "sdk.dir=$HOME/Android/Sdk" > local.properties   # path to your Android SDK
-./gradlew assembleRelease                            # → app/build/outputs/apk/release/app-release.apk
-./gradlew testDebugUnitTest                          # core engine tests
+# bump versionCode + versionName in version.properties, then:
+./release.sh        # tests, then dist/<version>/RoadAhead-<version>.apk + .aab (never overwrites)
 ```
 
 ### Code layout
